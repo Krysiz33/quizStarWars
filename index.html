@@ -37,6 +37,7 @@
         align-items: center;
         padding: 10px 20px;
         border-bottom: 2px solid #333;
+        z-index: 10;
       }
 
       #title {
@@ -54,7 +55,7 @@
         position: relative;
         margin-top: 80px;
         overflow: hidden;
-        display: flex;
+        display: none;
         justify-content: center;
         align-items: flex-end;
         gap: 20px;
@@ -104,7 +105,7 @@
       #footer {
         background: #222;
         padding: 15px 10px;
-        display: flex;
+        display: none;
         flex-wrap: wrap;
         justify-content: center;
         gap: 10px;
@@ -124,6 +125,21 @@
 
       button:hover {
         background: #666;
+      }
+
+      #start-container {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #start-button {
+        font-size: 1.5em;
+        padding: 15px 30px;
+        background: #ffe81f;
+        color: black;
+        font-weight: bold;
       }
 
       @media (max-width: 600px) {
@@ -159,13 +175,15 @@
       <div id="timer">45</div>
     </div>
 
+    <div id="start-container">
+      <button id="start-button">Rozpocznij grę</button>
+    </div>
+
     <div id="prolog-container">
       <div id="left-side"></div>
-
       <div id="prolog">
         <p>W odległej galaktyce... (Prolog z filmu)</p>
       </div>
-
       <div id="right-side"></div>
     </div>
 
@@ -175,6 +193,10 @@
       const timerElement = document.getElementById("timer");
       const prologElement = document.getElementById("prolog");
       const footerElement = document.getElementById("footer");
+      const startContainer = document.getElementById("start-container");
+      const startButton = document.getElementById("start-button");
+      const prologContainer = document.getElementById("prolog-container");
+
       let timer = 45;
       let correctAnswer;
       const episodes = [
@@ -206,14 +228,13 @@
         );
         const data = await response.json();
         correctAnswer = episodeNumber;
+        console.log(data);
 
         prologElement.textContent = data.opening_crawl;
 
         prologElement.style.animation = "none";
         prologElement.offsetHeight;
         prologElement.style.animation = "scroll-text 40s linear forwards";
-
-        startTimer();
       }
 
       function checkAnswer(selected) {
@@ -231,6 +252,8 @@
 
       function startTimer() {
         clearInterval(window.timerInterval);
+        timer = 45;
+        timerElement.textContent = timer;
         window.timerInterval = setInterval(() => {
           if (timer > 0) {
             timer--;
@@ -244,15 +267,19 @@
       }
 
       function resetGame() {
-        timer = 45;
-        timerElement.textContent = timer;
         getProlog();
+        startTimer();
       }
 
-      window.onload = () => {
+      function startGame() {
+        startContainer.style.display = "none";
+        prologContainer.style.display = "flex";
+        footerElement.style.display = "flex";
         createEpisodeButtons();
-        getProlog();
-      };
+        resetGame();
+      }
+
+      startButton.addEventListener("click", startGame);
     </script>
   </body>
 </html>
